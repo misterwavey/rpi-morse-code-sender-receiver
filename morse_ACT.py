@@ -1,18 +1,13 @@
-import RPi.GPIO as GPIO
 import sys
 import time
+import os
 
-timeMultiplier = 10
-pinNum = 12
+timeMultiplier = 5
 
 DOT_TIME = 0.01 * timeMultiplier
 DASH_TIME = DOT_TIME * 3
 SPACE_TIME = DASH_TIME * 2
 PAUSE_TIME = DASH_TIME 
-
-GPIO.setmode(GPIO.BOARD) #numbering scheme that corresponds to breakout board and pin layout
-GPIO.setup(pinNum, GPIO.OUT) #replace pinNum with whatever pin you used, this sets up that pin as an output
-
 CODE = {' ': ' ', "'": '.----.', 
         '(': '-.--.-', ')': '-.--.-', ',': '--..--', '-': '-....-', 
         '.': '.-.-.-', '/': '-..-.', '0': '-----', '1': '.----', 
@@ -27,15 +22,15 @@ CODE = {' ': ' ', "'": '.----.',
         'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 
         'Z': '--..', '_': '..--.-'} 
 
-def morseDot():
-    GPIO.output(pinNum, GPIO.HIGH)
+def morseDot(): 
+    os.system("echo 1 > /sys/class/leds/led0/brightness")
     time.sleep(DOT_TIME)
-    GPIO.output(pinNum, GPIO.LOW)
+    os.system("echo 0 > /sys/class/leds/led0/brightness")
 
 def morseDash():
-    GPIO.output(pinNum, GPIO.HIGH)
+    os.system("echo 1 > /sys/class/leds/led0/brightness")
     time.sleep(DASH_TIME)
-    GPIO.output(pinNum, GPIO.LOW)
+    os.system("echo 0 > /sys/class/leds/led0/brightness")
 
 def morseSpace():
     time.sleep(SPACE_TIME)
@@ -60,15 +55,24 @@ def convertStringToMorse(msg):
         sys.stdout.write(letter)
         sys.stdout.flush()
         time.sleep(PAUSE_TIME)
+    sys.stdout.write('\n')
+    sys.stdout.flush()
+
+def cleanup():
+    os.system("echo mmc0 > /sys/class/leds/led0/trigger")
+
+def setup():
+    os.system("echo none > /sys/class/leds/led0/trigger")
 
 if __name__ == "__main__":
     try:
+        setup()
         if len(sys.argv[1:]) != 0:
             words =  ' '.join(sys.argv[1:])
             convertStringToMorse(words)
         else:
             words =  sys.stdin.read().replace('\n','  ')
             convertStringToMorse(words)
-        GPIO.cleanup()
+        cleanup()
     except KeyboardInterrupt:
-        GPIO.cleanup()
+        cleanup()
