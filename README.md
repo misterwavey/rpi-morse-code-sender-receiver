@@ -15,4 +15,5 @@ morse\_ACT
 =========
 
 this will morse blink via on-board "ACT" led, no GPIO wire needed.
-note: "ACT" led used for SD card indication, `morse_ACT.py will restore the "ACT" function for SD card when exit or interruption.
+
+**note**: "ACT" led used for SD card indication, `morse_ACT.py will restore the "ACT" function for SD card when exit or interruption.
